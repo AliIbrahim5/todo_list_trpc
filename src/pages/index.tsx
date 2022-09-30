@@ -16,36 +16,33 @@ const Home: NextPage = () => {
   const deleted = trpc.useMutation("todo.delete");
 
 
-  
-  const addTodo = (e): object => {
+  const addTodo = async (e): object => {
     e.preventDefault();
-
-    add.mutate({ name: e.target.name.value, dec: e.target.dec.value });
+   const addd = await { name: e.target.name.value, dec: e.target.dec.value}
+    add.mutate(addd);
   };
- 
 
-  const updateTodo = (e): object => {
-    const filtered = todos?.data?.todos.filter((todo) => {
+  const updateTodo = async (e): object => {
+    const filtered = await todos?.data?.todos.filter((todo) => {
       if (todo.id === e.id) {
         return (
-          todo.name = prompt('Enter your name') ,
-          todo.dec = prompt('Enter your dec')
-          );
+          (todo.name = prompt("Enter your name")),
+          (todo.dec = prompt("Enter your dec"))
+        );
       }
     });
 
     update.mutate(filtered[0]);
   };
 
-  const deleteTodo = (e): object => {
-    const deletee = todos?.data?.todos.splice((todo) => {
-      return todo.id !== e.id;
-    });
-    //  console.log('gggg',e.id);
-    deleted.mutate(deletee[0]);
+  const deleteTodo = async (e): object => {
+     const del = await todos?.data?.todos.filter((item) => item.id !== e);
+    
+      deleted.mutate(e)
+     
+    
   };
- 
-  
+
   return (
     <div className=" bg-gray-300">
       <Head>
