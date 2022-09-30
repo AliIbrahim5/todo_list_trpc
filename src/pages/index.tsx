@@ -8,25 +8,40 @@ import Swal from "sweetalert2";
 import { string } from "zod";
 import { utimesSync } from "fs";
 const Home: NextPage = () => {
-  // const [todo, setTodo] = useState([]);
-
+  const [todo, setTodo] = useState([]);
+  const utils = trpc.useContext();
   const todos = trpc.useQuery(["todo.get"]);
-  const add = trpc.useMutation("todo.AddTodo");
-  const update = trpc.useMutation("todo.update");
-  const deleted = trpc.useMutation("todo.delete");
+  
+  const add = trpc.useMutation("todo.AddTodo", {
+    onSuccess: () => {
+      utils.invalidateQueries("todo.get");
+    },
+  });
+  const update = trpc.useMutation("todo.update", {
+    onSuccess: () => {
+      utils.invalidateQueries("todo.get");
+    },
+  });
+  const deleted = trpc.useMutation("todo.delete", {
+    onSuccess: () => {
+      utils.invalidateQueries("todo.get");
+    },
+  });
 
 
-  const addTodo = async (e): object => {
+  const addTodo =  (e): void => {
     e.preventDefault();
-   const addd = await { name: e.target.name.value, dec: e.target.dec.value}
+   const addd =  { name: e.target.name.value, dec: e.target.dec.value}
     add.mutate(addd);
   };
 
-  const updateTodo = async (e): object => {
-    const filtered = await todos?.data?.todos.filter((todo) => {
+
+
+  const updateTodo =  (e): void => {
+    const filtered =  todos?.data?.todos.filter((todo) => {
       if (todo.id === e.id) {
         return (
-          (todo.name = prompt("Enter your name")),
+          (todo.name = prompt("Enter your name") ),
           (todo.dec = prompt("Enter your dec"))
         );
       }
@@ -35,10 +50,10 @@ const Home: NextPage = () => {
     update.mutate(filtered[0]);
   };
 
-  const deleteTodo = async (e): object => {
-     const del = await todos?.data?.todos.filter((item) => item.id !== e);
+  const deleteTodo =  (id:string): void => {
+      
     
-      deleted.mutate(e)
+      deleted.mutate( id )
      
     
   };
@@ -53,7 +68,7 @@ const Home: NextPage = () => {
 
       <div className="h-100 w-full flex items-center justify-center bg-teal-lightest font-sans">
         <div className="bg-gray-200 rounded shadow p-6 m-4 w-full lg:w-3/4 lg:max-w-lg">
-          <form onSubmit={addTodo}>
+          <form  onSubmit={addTodo}>
             <div className="mb-4">
               <h1 className="text-grey-darkest">Todo List</h1>
               <div className="flex mt-4">
@@ -76,12 +91,12 @@ const Home: NextPage = () => {
                 </button>
               </div>
             </div>
-          </form>
+         </form>
 
           <div>
             {todos?.data?.todos?.map((e) => {
               return (
-                <div className="flex mb-4 items-center">
+                <div  key={e.id} className="flex mb-4 items-center">
                
                   <p className=" flex  w-full text-grey-darkest  ">{e.name}</p>
                   <p className=" flex  w-full text-grey-darkest">{e.dec}</p>
@@ -94,7 +109,7 @@ const Home: NextPage = () => {
                   </button>
                   <button
                     key={null}
-                    onClick={() => deleteTodo(e)}
+                    onClick={() => deleteTodo(e.id)}
                     className="flex-no-shrink p-2 ml-2 border-2 rounded text-red border-red hover:text-gray-500 hover:bg-red  bg-red-500"
                   >
                     delete

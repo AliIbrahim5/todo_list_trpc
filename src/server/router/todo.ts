@@ -43,15 +43,12 @@ export const TodoRouter = createRouter()
     },
   })
   .mutation("delete", {
-    input: z.object({
-      id: z.string(),
-      name: z.string(),
-      dec: z.string(),
-    }),
+    input: z.string(),
+
     resolve: async ({ ctx, input }) => {
       return await ctx.prisma.todo.delete({
         where: {
-          id: input.id,
+          id: input,
         },
       });
     },
